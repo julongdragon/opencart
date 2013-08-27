@@ -1,0 +1,177 @@
+<modification>
+
+    <id>Automatically generate SEO url for caregories,products in Vietnamese</id>
+    <version>1.0.0</version>
+    <vqmver>1.0.0</vqmver>
+    <author>dezign.vn</author>
+	
+	<file name="admin/model/catalog/category.php">
+        <operation>
+            <search position="after" offset="2"><![CDATA[if ($data['keyword']) {]]></search>
+            <add><![CDATA[else {
+                    $dez_cat_name = $data['category_description'][2]['name'];
+					
+					$dez_cat_name = htmlspecialchars_decode($dez_cat_name,ENT_QUOTES);
+										
+                    $dez_alias_name = preg_replace('/\%/',' percent ',$dez_cat_name);
+					$dez_alias_name = preg_replace("/[\x{00C0}-\x{00C3}\x{00E0}-\x{00E3}\x{0102}\x{0103}\x{1EA0}-\x{1EB7}]/u", "a", $dez_alias_name);
+					$dez_alias_name = preg_replace("/[\x{00C8}-\x{00CA}\x{00E8}-\x{00EA}\x{1EB8}-\x{1EC7}]/u", "e", $dez_alias_name);
+					$dez_alias_name = preg_replace("/[\x{00CC}\x{00CD}\x{00EC}\x{00ED}\x{0128}\x{0129}\x{1EC8}-\x{1ECB}]/u", "i", $dez_alias_name);
+					$dez_alias_name = preg_replace("/[\x{00D2}-\x{00D5}\x{00F2}-\x{00F5}\x{01A0}\x{01A1}\x{1ECC}-\x{1EE3}]/u", "o", $dez_alias_name);
+					$dez_alias_name = preg_replace("/[\x{00D9}-\x{00DA}\x{00F9}-\x{00FA}\x{0168}\x{0169}\x{01AF}\x{01B0}\x{1EE4}-\x{1EF1}]/u", "u", $dez_alias_name);
+					$dez_alias_name = preg_replace("/[\x{00DD}\x{00FD}\x{1EF2}-\x{1EF9}]/u", "y", $dez_alias_name);
+					$dez_alias_name = preg_replace("/[\x{0110}\x{0111}]/u", "d", $dez_alias_name);
+                    $dez_alias_name = preg_replace('/\@/','',$dez_alias_name);
+                    $dez_alias_name = preg_replace('/\&/',' and ',$dez_alias_name);
+                    $dez_alias_name = preg_replace('/\s[\s]+/','-',$dez_alias_name);    // Strip off multiple spaces
+                    $dez_alias_name = preg_replace('/[\s\W]+/','-',$dez_alias_name);    // Strip off spaces and non-alpha-numeric
+                    $dez_alias_name = preg_replace('/^[\-]+/','',$dez_alias_name); // Strip off the starting hyphens
+                    $dez_alias_name = preg_replace('/[\-]+$/','',$dez_alias_name); // // Strip off the ending hyphens
+					
+                    $dez_alias_name = strtolower($dez_alias_name); 
+
+                    $intreek_query = $this->db->query("SELECT COUNT(*) as `total` FROM " . DB_PREFIX . "url_alias WHERE keyword = '" . $this->db->escape($dez_alias_name) . "'");
+                    $occurance_count = $intreek_query->row['total'];
+                    $okay = false;
+                    $count_modifier = '';
+                    $intreek_count = 0;
+
+                    do
+                    {
+                        if($intreek_count > 0)
+                        {
+                            $count_modifier = '-'.$intreek_count;
+                        }
+                        $intreek_query = $this->db->query("SELECT COUNT(*) as `total` FROM " . DB_PREFIX . "url_alias WHERE keyword = '" . $this->db->escape($dez_alias_name) . $count_modifier .  "'");
+
+                        $occurance = $intreek_query->row['total'];
+                        if($occurance == 0)
+                        {
+                            $okay = true;
+                        }   
+                        else
+                        {
+                            $intreek_count++;
+                        }
+                    } while($okay == false);
+
+                    $this->db->query("INSERT INTO " . DB_PREFIX . "url_alias SET query = 'category_id=" . (int)$category_id . "', keyword = '" . $this->db->escape($dez_alias_name) . $count_modifier ."'");
+                }
+            ]]></add>
+        </operation>    
+    </file>     
+	
+    <file name="admin/model/catalog/product.php">
+        <operation>
+            <search position="after" offset="2"><![CDATA[if ($data['keyword']) {]]></search>
+            <add><![CDATA[else {
+                    $dez_cat_name = $data['product_description'][2]['name'];
+					
+					
+                    $dez_cat_name = htmlspecialchars_decode($dez_cat_name,ENT_QUOTES);
+										
+                    $dez_alias_name = preg_replace('/\%/',' percent ',$dez_cat_name);
+					$dez_alias_name = preg_replace("/[\x{00C0}-\x{00C3}\x{00E0}-\x{00E3}\x{0102}\x{0103}\x{1EA0}-\x{1EB7}]/u", "a", $dez_alias_name);
+					$dez_alias_name = preg_replace("/[\x{00C8}-\x{00CA}\x{00E8}-\x{00EA}\x{1EB8}-\x{1EC7}]/u", "e", $dez_alias_name);
+					$dez_alias_name = preg_replace("/[\x{00CC}\x{00CD}\x{00EC}\x{00ED}\x{0128}\x{0129}\x{1EC8}-\x{1ECB}]/u", "i", $dez_alias_name);
+					$dez_alias_name = preg_replace("/[\x{00D2}-\x{00D5}\x{00F2}-\x{00F5}\x{01A0}\x{01A1}\x{1ECC}-\x{1EE3}]/u", "o", $dez_alias_name);
+					$dez_alias_name = preg_replace("/[\x{00D9}-\x{00DA}\x{00F9}-\x{00FA}\x{0168}\x{0169}\x{01AF}\x{01B0}\x{1EE4}-\x{1EF1}]/u", "u", $dez_alias_name);
+					$dez_alias_name = preg_replace("/[\x{00DD}\x{00FD}\x{1EF2}-\x{1EF9}]/u", "y", $dez_alias_name);
+					$dez_alias_name = preg_replace("/[\x{0110}\x{0111}]/u", "d", $dez_alias_name);
+                    $dez_alias_name = preg_replace('/\@/','',$dez_alias_name);
+                    $dez_alias_name = preg_replace('/\&/',' and ',$dez_alias_name);
+                    $dez_alias_name = preg_replace('/\s[\s]+/','-',$dez_alias_name);    // Strip off multiple spaces
+                    $dez_alias_name = preg_replace('/[\s\W]+/','-',$dez_alias_name);    // Strip off spaces and non-alpha-numeric
+                    $dez_alias_name = preg_replace('/^[\-]+/','',$dez_alias_name); // Strip off the starting hyphens
+                    $dez_alias_name = preg_replace('/[\-]+$/','',$dez_alias_name); // // Strip off the ending hyphens
+					
+                    $dez_alias_name = strtolower($dez_alias_name); 
+
+                    $intreek_query = $this->db->query("SELECT COUNT(*) as `total` FROM " . DB_PREFIX . "url_alias WHERE keyword = '" . $this->db->escape($dez_alias_name) . "'");
+                    $occurance_count = $intreek_query->row['total'];
+                    $okay = false;
+                    $count_modifier = '';
+                    $intreek_count = 0;
+
+                    do
+                    {
+                        if($intreek_count > 0)
+                        {
+                            $count_modifier = '-'.$intreek_count;
+                        }
+                        $intreek_query = $this->db->query("SELECT COUNT(*) as `total` FROM " . DB_PREFIX . "url_alias WHERE keyword = '" . $this->db->escape($dez_alias_name) . $count_modifier .  "'");
+
+                        $occurance = $intreek_query->row['total'];
+                        if($occurance == 0)
+                        {
+                            $okay = true;
+                        }   
+                        else
+                        {
+                            $intreek_count++;
+                        }
+                    } while($okay == false);
+
+                    $this->db->query("INSERT INTO " . DB_PREFIX . "url_alias SET query = 'product_id=" . (int)$product_id . "', keyword = '" . $this->db->escape($dez_alias_name) . $count_modifier ."'");
+                }
+            ]]></add>
+        </operation>    
+    </file>     
+	
+	<file name="admin/model/catalog/information.php">
+        <operation>
+            <search position="after" offset="2"><![CDATA[if ($data['keyword']) {]]></search>
+            <add><![CDATA[else {
+                    $dez_cat_name = $data['information_description'][2]['title'];
+					
+					
+                    $dez_cat_name = htmlspecialchars_decode($dez_cat_name,ENT_QUOTES);
+										
+                    $dez_alias_name = preg_replace('/\%/',' percent ',$dez_cat_name);
+					$dez_alias_name = preg_replace("/[\x{00C0}-\x{00C3}\x{00E0}-\x{00E3}\x{0102}\x{0103}\x{1EA0}-\x{1EB7}]/u", "a", $dez_alias_name);
+					$dez_alias_name = preg_replace("/[\x{00C8}-\x{00CA}\x{00E8}-\x{00EA}\x{1EB8}-\x{1EC7}]/u", "e", $dez_alias_name);
+					$dez_alias_name = preg_replace("/[\x{00CC}\x{00CD}\x{00EC}\x{00ED}\x{0128}\x{0129}\x{1EC8}-\x{1ECB}]/u", "i", $dez_alias_name);
+					$dez_alias_name = preg_replace("/[\x{00D2}-\x{00D5}\x{00F2}-\x{00F5}\x{01A0}\x{01A1}\x{1ECC}-\x{1EE3}]/u", "o", $dez_alias_name);
+					$dez_alias_name = preg_replace("/[\x{00D9}-\x{00DA}\x{00F9}-\x{00FA}\x{0168}\x{0169}\x{01AF}\x{01B0}\x{1EE4}-\x{1EF1}]/u", "u", $dez_alias_name);
+					$dez_alias_name = preg_replace("/[\x{00DD}\x{00FD}\x{1EF2}-\x{1EF9}]/u", "y", $dez_alias_name);
+					$dez_alias_name = preg_replace("/[\x{0110}\x{0111}]/u", "d", $dez_alias_name);
+                    $dez_alias_name = preg_replace('/\@/','',$dez_alias_name);
+                    $dez_alias_name = preg_replace('/\&/',' and ',$dez_alias_name);
+                    $dez_alias_name = preg_replace('/\s[\s]+/','-',$dez_alias_name);    // Strip off multiple spaces
+                    $dez_alias_name = preg_replace('/[\s\W]+/','-',$dez_alias_name);    // Strip off spaces and non-alpha-numeric
+                    $dez_alias_name = preg_replace('/^[\-]+/','',$dez_alias_name); // Strip off the starting hyphens
+                    $dez_alias_name = preg_replace('/[\-]+$/','',$dez_alias_name); // // Strip off the ending hyphens
+					
+                    $dez_alias_name = strtolower($dez_alias_name); 
+
+                    $intreek_query = $this->db->query("SELECT COUNT(*) as `total` FROM " . DB_PREFIX . "url_alias WHERE keyword = '" . $this->db->escape($dez_alias_name) . "'");
+                    $occurance_count = $intreek_query->row['total'];
+                    $okay = false;
+                    $count_modifier = '';
+                    $intreek_count = 0;
+
+                    do
+                    {
+                        if($intreek_count > 0)
+                        {
+                            $count_modifier = '-'.$intreek_count;
+                        }
+                        $intreek_query = $this->db->query("SELECT COUNT(*) as `total` FROM " . DB_PREFIX . "url_alias WHERE keyword = '" . $this->db->escape($dez_alias_name) . $count_modifier .  "'");
+
+                        $occurance = $intreek_query->row['total'];
+                        if($occurance == 0)
+                        {
+                            $okay = true;
+                        }   
+                        else
+                        {
+                            $intreek_count++;
+                        }
+                    } while($okay == false);
+
+                    $this->db->query("INSERT INTO " . DB_PREFIX . "url_alias SET query = 'information_id=" . (int)$information_id . "', keyword = '" . $this->db->escape($dez_alias_name) . $count_modifier ."'");
+                }
+            ]]></add>
+        </operation>    
+    </file>
+</modification>
